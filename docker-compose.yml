@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+
+  test_db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: mydatabase_test
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"  # Expose test database on a different port to avoid conflict
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
+  postgres_test_data:
